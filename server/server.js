@@ -19,6 +19,9 @@ app.use(cors());
 //Error handling
 app.use(errorHandler);
 
+//Route for user Registartion and Authentication
+app.use("/api/register", require("./routes/userRoutes"));
+
 // using hbs
 app.set('view engine','hbs');
 
