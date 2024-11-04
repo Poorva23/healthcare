@@ -1,18 +1,18 @@
 const asyncHandler = require("express-async-handler");
-const User = require("../models/userModel");
+const User = require("../models/userModels");
 const bcrypt = require("bcrypt");
-require('dotenv').config;
+require('dotenv').config();
 
-//check if all fields are provided
 const registerUser = asyncHandler(async (req, res) => {
-    const { firstName, lastName, age, phoneNumber, bloodGroup, gender, email, password } = req.body;
+    const { firstName, lastName, email, password, age, gender, bloodGroup, phoneNumber } = req.body;
 
-    if (!firstName || !lastName || !age || !bloodGroup || !gender || !email || !password || !phoneNumber) {
+    // Check if all fields are provided
+    if (!firstName || !lastName || !email || !password || !age || !gender || !bloodGroup || !phoneNumber) {
         res.status(400);
         throw new Error("Please add all fields");
-    }    
+    }
 
-    //check if user already exists
+    // Check if user already exists
     const userExists = await User.findOne({ email });
 
     if (userExists) {
@@ -20,35 +20,35 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new Error("User already exists");
     }
 
-    //hash password
+    // Hash the password
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);    
+    const hashedPassword = await bcrypt.hash(password, salt);
 
-    //create user
+    // Create user
     const user = await User.create({
-        firstName,  
+        firstName,
         lastName,
-        age,
-        bloodGroup,
-        gender,
-        phoneNumber,
         email,
-        password: hashedPassword
-    });  
-    
-    res.status(201).json({message: "User Registered Successfully", user});
+        password: hashedPassword,
+        age,
+        gender,
+        bloodGroup,
+        phoneNumber
+    });
 
-    if (user) {        
+    if (user) {
         res.status(201).json({
-            _id: user.id,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            age: user.age,
-            bloodGroup: user.bloodGroup,
-            gender: user.gender,
-            phoneNumber: user.phoneNumber,
-            email: user.email,
-            token: generateToken(user._id)
+            message: "User Registered Successfully",
+            user: {
+                _id: user.id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                age: user.age,
+                gender: user.gender,
+                bloodGroup: user.bloodGroup,
+                phoneNumber: user.phoneNumber
+            }
         });
     } else {
         res.status(400);
@@ -56,6 +56,4 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 });
 
-module.exports = {
-    registerUser
-};
+module.exports = { registerUser};

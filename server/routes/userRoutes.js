@@ -1,17 +1,13 @@
-// routes/userRoutes.js
 const express = require("express");
 const router = express.Router();
+const { registerUser } = require("../controllers/userController");
+const { registerDoctor } = require("../controllers/doctorDetailsController");
 
-const{
-    registerUser
-    //loginUser
-} = require("../controllers/userController");
-    
+// Route for user registration
+router.post("/", registerUser);
 
-//route for user registration
-router.post("/register", registerUser);
-
-//route for user login
-//router.post("/login", loginUser);
+// Route for user login
+// Uncomment and implement loginUser as needed
+// router.post("/login", loginUser);
 
 module.exports = router;
