@@ -17,7 +17,7 @@ const port = process.env.PORT || 5000;
 
 // Middleware setup
 app.use(cors());
-app.use(express.json()); // for parsing application/json
+app.use(express.json());
 
 // Handlebars view engine setup
 app.set('view engine', 'hbs');
@@ -25,8 +25,9 @@ hbs.registerPartials(path.join(__dirname, '/views/partials'));
 
 // Routes
 const doctorRoutes = require("./routes/doctorDetailsRoutes");
+const userRoutes = require("./routes/userRoutes");
 app.use("/api/doctors", doctorRoutes);
-app.use("/api/register", require("./routes/userRoutes")); // Assuming you have userRoutes set up
+app.use("/api/users", userRoutes); // Updated to use '/api/users' route
 
 // Error handling middleware
 app.use(errorHandler);
@@ -55,5 +56,5 @@ app.get("/user", (req, res) => {
 
 // Server Listening
 app.listen(port, () => {
-    console.log(`Server is running on port http://localhost:${port}`);
+    console.log(`Server is running on http://localhost:${port}`);
 });

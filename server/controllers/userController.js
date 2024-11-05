@@ -1,26 +1,24 @@
 const asyncHandler = require("express-async-handler");
-const User = require("../models/userModels");
+const User = require("../models/userModels"); // Ensure this path is correct
 const bcrypt = require("bcrypt");
-require('dotenv').config();
 
+// Register user
 const registerUser = asyncHandler(async (req, res) => {
     const { firstName, lastName, email, password, age, gender, bloodGroup, phoneNumber } = req.body;
 
-    // Check if all fields are provided
     if (!firstName || !lastName || !email || !password || !age || !gender || !bloodGroup || !phoneNumber) {
         res.status(400);
-        throw new Error("Please add all fields");
+        throw new Error("Please fill all fields");
     }
 
     // Check if user already exists
     const userExists = await User.findOne({ email });
-
     if (userExists) {
         res.status(400);
         throw new Error("User already exists");
     }
 
-    // Hash the password
+    // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -38,17 +36,8 @@ const registerUser = asyncHandler(async (req, res) => {
 
     if (user) {
         res.status(201).json({
-            message: "User Registered Successfully",
-            user: {
-                _id: user.id,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
-                age: user.age,
-                gender: user.gender,
-                bloodGroup: user.bloodGroup,
-                phoneNumber: user.phoneNumber
-            }
+            _id: user.id,
+            email: user.email
         });
     } else {
         res.status(400);
@@ -56,4 +45,35 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 });
 
-module.exports = { registerUser};
+// Login user
+const loginUser = asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        res.status(400);
+        throw new Error("Please enter both email and password");
+    }
+
+    // Check if user exists
+    const user = await User.findOne({ email });
+    if (!user) {
+        res.status(400);
+        throw new Error("User not found");
+    }
+
+    // Check if password matches
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect) {
+        res.status(400);
+        throw new Error("Invalid email or password");
+    }
+
+    // Successful login
+    res.status(200).json({
+        _id: user.id,
+        email: user.email,
+        message: "Login successful"
+    });
+});
+
+module.exports = { registerUser, loginUser };
