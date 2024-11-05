@@ -1,4 +1,6 @@
 const express = require("express");
+const multer = require("multer");
+const upload = multer({dest: "uploads/"});
 const connectDb = require("./config/dbConnection");
 const errorHandler = require("./middlewares/errorHandler");
 const cors = require("cors");
@@ -58,3 +60,24 @@ app.get("/user", (req, res) => {
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
+
+app.post('/profile', upload.single('avatar'), function(req, res, next){
+    console.log(req.body);
+    console.log(req.file);
+    return res.redirect('/home');
+})
+
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, '/tmp/my-uploads')
+    },
+    filename: function (req, file, cb) {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+      cb(null, file.fieldname + '-' + uniqueSuffix)
+    }
+  })
+  
+  const uploads = multer({ storage: storage })
+
+  
