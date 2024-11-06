@@ -6,17 +6,23 @@
     <title>Home</title>
 </head>
 <body>
-    <div>
-        <form action="/profile" method="post" enctype="multipart/form-data">
-            <input type="file" name="avatar" />
-            <input type="submit" value="Upload" >
-            <button type="submit">Submit</button>
-        </form>
-    </div>
-
     {{>header}}
     <a href="/user"><h2>redirect to user List</h2></a>
     <h1>Welcome, {{username}}!</h1>
     <p>Age: {{age}}</p>
+    <div>
+       <form action="/profile" method="post" enctype="multipart/form-data">
+        <input type="file" name="avatar" />
+        <input type="submit" value="Upload">
+        </form>
+    </div>
+
+    {{#if imageUrl}}
+        <div>
+            <h2>Your Uploaded Image</h2>
+            <img src="{{imageUrl}}" alt="Uploaded Avatar" style="max-width: 200px;">
+        </div>
+    {{/if}}
+
 </body>
 </html>
