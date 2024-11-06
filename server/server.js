@@ -51,7 +51,7 @@ app.get("/", (req, res) => {
 
 app.get("/home", (req, res) => {
     res.render("home", { 
-        username: "Piyush",
+        username: "Poorva",
         age: 20,
     });
 });
@@ -63,6 +63,20 @@ app.get("/user", (req, res) => {
         { username: "Divyam", age: 21 }
     ];
     res.render("user", { users });
+});
+
+app.post("/profile", upload.single("avatar"), function(req, res, next) {
+    if (!req.file) {
+        return res.status(400).send("No file uploaded.");
+    }
+    console.log(req.body);
+    console.log(req.file);
+
+    const fileName = req.file.filename;
+    const imageUrl = `/uploads/${fileName}`;
+    return res.render("home", {
+        imageUrl: imageUrl 
+    });
 });
 
 app.get('/gallery', (req, res) => {
