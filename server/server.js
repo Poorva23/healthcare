@@ -18,15 +18,14 @@ const storage = multer.diskStorage({
     },
     filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1E9);
-        const extension = path.extname(file.originalname);
-        cb(null, file.fieldname + "-" + uniqueSuffix + extension);
+        cb(null, file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname));
     }
 });
 const upload = multer({ storage: storage });
 
 const app = express();
 const port = process.env.PORT || 5000;
-
+// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Middleware setup
 app.use(cors());
 app.use(express.json());
@@ -38,12 +37,12 @@ hbs.registerPartials(path.join(__dirname, "/views/partials"));
 
 const doctorRoutes = require("./routes/doctorDetailsRoutes");
 const userRoutes = require("./routes/userRoutes");
-
 app.use("/api/doctors", doctorRoutes);
 app.use("/api/users", userRoutes);
 
 app.use(errorHandler); // Error handling middleware
 
+let imageUrls = [];
 // Basic Routes
 app.get("/", (req, res) => {
     res.send("Server is working");
@@ -74,9 +73,15 @@ app.post("/profile", upload.single("avatar"), function(req, res, next) {
 
     const fileName = req.file.filename;
     const imageUrl = `/uploads/${fileName}`;
-    return res.render("home", {
-        imageUrl: imageUrl 
+    imageUrls.push(imageUrl);
+    return res.render("gallery", {
+        imageUrls: imageUrls
     });
+});
+
+app.get("/gallery", (req, res) => {
+    const imageUrls = []; 
+    res.render("images", { imageUrls: imageUrls }); 
 });
 
 app.get('/gallery', (req, res) => {
@@ -98,8 +103,6 @@ app.get('/gallery', (req, res) => {
     });
 });
 
-// Make the uploads folder static so images can be accessed by the browser
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Start server
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);

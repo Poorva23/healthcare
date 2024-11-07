@@ -2,17 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Gallery</title>
+    <title>All Images</title>
 </head>
 <body>
-    <h1>Uploaded Images</h1>
-    <div style="display: flex; flex-wrap: wrap;">
-        {{#each images}}
-            <div style="margin: 10px;">
-                <img src="{{this}}" alt="Uploaded Image" style="width: 150px; height: auto;"/>
+    <h1>All Uploaded Images</h1>
+    {{#if imageUrls.length}}
+        {{#each imageUrls}}
+            <div>
+                <img src="{{this}}" alt="Uploaded Image" style="max-width: 300px; margin: 10px;">
             </div>
         {{/each}}
-    </div>
+    {{else}}
+        <p>No images found.</p>
+    {{/if}}
 </body>
 </html>
