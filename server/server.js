@@ -25,7 +25,7 @@ const upload = multer({ storage: storage });
 
 const app = express();
 const port = process.env.PORT || 5000;
-// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Middleware setup
 app.use(cors());
 app.use(express.json());
@@ -42,7 +42,17 @@ app.use("/api/users", userRoutes);
 
 app.use(errorHandler); // Error handling middleware
 
+// Load existing images on server start
 let imageUrls = [];
+const imageFolderPath = path.join(__dirname, 'uploads');
+fs.readdir(imageFolderPath, (err, files) => {
+    if (err) {
+        console.error("Error reading files on startup:", err);
+    } else {
+        imageUrls = files.map(file => `/uploads/${file}`);
+    }
+});
+
 // Basic Routes
 app.get("/", (req, res) => {
     res.send("Server is working");
@@ -73,34 +83,14 @@ app.post("/profile", upload.single("avatar"), function(req, res, next) {
 
     const fileName = req.file.filename;
     const imageUrl = `/uploads/${fileName}`;
-    imageUrls.push(imageUrl);
+    imageUrls.push(imageUrl); // Store the new image URL in the array
     return res.render("gallery", {
         imageUrls: imageUrls
     });
 });
 
 app.get("/gallery", (req, res) => {
-    const imageUrls = []; 
-    res.render("images", { imageUrls: imageUrls }); 
-});
-
-app.get('/gallery', (req, res) => {
-    const imageFolderPath = path.join(__dirname, 'uploads');
-    
-    // Read files from the uploads folder
-    fs.readdir(imageFolderPath, (err, files) => {
-        if (err) {
-            console.error("Error reading files:", err);
-            res.status(500).send("Error retrieving images");
-            return;
-        }
-        
-        // Filter for only image files
-        const images = files.map(file => `/uploads/${file}`);
-        
-        // Render the gallery view with the images array
-        res.render('gallery', { images });
-    });
+    res.render("gallery", { images: imageUrls }); // Use the loaded image URLs
 });
 
 // Start server
