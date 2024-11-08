@@ -46,4 +46,14 @@ const registerDoctor = asyncHandler(async (req, res) => {
     }
 });
 
-module.exports = { registerDoctor };
+// Function to retrieve all registered doctors
+const getAllDoctors = asyncHandler(async (req, res) => {
+    try {
+        const doctors = await Doctor.find(); // Fetch all doctors from the database
+        res.status(200).json(doctors);
+    } catch (error) {
+        res.status(500).json({ error: "Failed to fetch doctors." });
+    }
+});
+
+module.exports = { registerDoctor, getAllDoctors };

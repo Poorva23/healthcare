@@ -1,6 +1,12 @@
 const asyncHandler = require("express-async-handler");
 const User = require("../models/userModels"); // Ensure this path is correct
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
+// Function to generate JWT token
+const generateJwtToken = (userId) => {
+    return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: '1h' });
+}
 
 // Register user
 const registerUser = asyncHandler(async (req, res) => {
@@ -37,7 +43,8 @@ const registerUser = asyncHandler(async (req, res) => {
     if (user) {
         res.status(201).json({
             _id: user.id,
-            email: user.email
+            email: user.email,
+            token: generateJwtToken(user.id) // Return the JWT token
         });
     } else {
         res.status(400);
@@ -72,6 +79,7 @@ const loginUser = asyncHandler(async (req, res) => {
     res.status(200).json({
         _id: user.id,
         email: user.email,
+        token: generateJwtToken(user.id), // Return the JWT token
         message: "Login successful"
     });
 });
