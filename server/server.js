@@ -86,7 +86,7 @@ app.post("/profile", upload.single("avatar"), function(req, res, next) {
     imageUrls.push(imageUrl); // Store the new image URL in the array
     return res.render("gallery", {
         imageUrls: imageUrls
-    });
+    });
 });
 
 app.get("/gallery", (req, res) => {
