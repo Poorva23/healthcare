@@ -79,9 +79,51 @@ const loginUser = asyncHandler(async (req, res) => {
     res.status(200).json({
         _id: user.id,
         email: user.email,
-        token: generateJwtToken(user.id), // Return the JWT token
+        token: generateJwtToken(user.id), 
         message: "Login successful"
     });
 });
 
-module.exports = { registerUser, loginUser };
+// Get user profile
+const getUserProfile = asyncHandler(async (req, res) => {
+    const userId = req.user.id; // Extract user id from the JWT token (set by the validateJwtToken middleware)
+    const data = await User.findById(userId);  // Use `findById` to fetch user by id
+    
+    if (!data) {
+        return res.status(401).json({ message: "User not found" });
+    }
+    res.json(data);
+});
+
+// Update user profile
+const updateUserProfile = asyncHandler(async (req, res) => {
+    const userId = req.user.id; // Extract user id from the JWT token (set by the validateJwtToken middleware)
+    const { firstName, lastName, email, age, gender, bloodGroup, phoneNumber, password } = req.body;
+
+    // Find user by ID
+    const data = await User.findById(userId);
+
+    if (!data) {
+        return res.status(401).json({ message: "User not found" });
+    }
+
+    // Optionally, update password if provided
+    if (password) {
+        const salt = await bcrypt.genSalt(10);
+        data.password = await bcrypt.hash(password, salt);
+    }
+
+    // Update other fields
+    data.firstName = firstName || data.firstName;
+    data.email = email || data.email;
+    data.password = password || data.password;
+
+    const updatedUser = await data.save(); // Save the updated user data
+
+    res.json({
+        message: "Profile updated successfully",
+        user: updatedUser
+    });
+});
+
+module.exports = { registerUser, loginUser, getUserProfile, updateUserProfile };
